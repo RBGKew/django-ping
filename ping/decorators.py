@@ -18,7 +18,6 @@ def http_basic_auth(func):
     from
     http://djangosnippets.org/snippets/1304/
     """
-    @wraps(func)
     def _decorator(request, *args, **kwargs):
         if getattr(settings, 'PING_BASIC_AUTH', PING_BASIC_AUTH):
             from django.contrib.auth import authenticate, login
