@@ -15,6 +15,7 @@ def status(request):
 
     response = "<h1>%s</h1>" % getattr(settings, 'PING_DEFAULT_RESPONSE', PING_DEFAULT_RESPONSE)
     content_type = getattr(settings, 'PING_DEFAULT_MIMETYPE', PING_DEFAULT_MIMETYPE)
+    response_status = 200
 
     if request.GET.get('checks') == 'true':
         response_dict = checks(request)
@@ -22,6 +23,8 @@ def status(request):
         for key, value in sorted(response_dict.items()):
             response += "<dt>%s</dt>" % str(key)
             response += "<dd>%s</dd>" % str(value)
+            if value != True:
+                response_status = 503 # service unavailable if one of the health checks fails
         response += "</dl>"
 
     if request.GET.get('fmt') == 'json':
@@ -33,4 +36,4 @@ def status(request):
         response = json.dumps(response_dict, sort_keys=True)
         content_type = 'application/json'
 
-    return HttpResponse(response, content_type=content_type, status=200)
+    return HttpResponse(response, content_type=content_type, status=response_status)
